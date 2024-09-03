@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const saleId = this.dataset.saleId;
             const salesCardSweetdream = parseFloat(document.querySelector(`[data-sale-id="${saleId}"][data-field="sales_card_sweetdream"]`).value);
-            const salesCardGlory = parseFloat(document.querySelector(`[data-sale-id="${saleId}"][data-field="sales_card_glory"]`).value);
+            // const salesCardGlory = parseFloat(document.querySelector(`[data-sale-id="${saleId}"][data-field="sales_card_glory"]`).value);
             const salesCash = parseFloat(document.querySelector(`[data-sale-id="${saleId}"][data-field="sales_cash"]`).value);
             const salesZeropay = parseFloat(document.querySelector(`[data-sale-id="${saleId}"][data-field="sales_zeropay"]`).value);
             const salesTransfer = parseFloat(document.querySelector(`[data-sale-id="${saleId}"][data-field="sales_transfer"]`).value);

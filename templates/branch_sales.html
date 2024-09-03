@@ -31,7 +31,6 @@
                     <th>날짜</th>
                     <th>지점명</th>
                     <th>카드(스위트드림)</th>
-                    <th>카드(글로리)</th>
                     <th>현금</th>
                     <th>제로페이</th>
                     <th>계좌이체</th>
@@ -45,7 +44,6 @@
                     <td>{{ sale['sale_date'] }}</td>
                     <td>{{ branches_dict[sale['branch_id']] }}</td>
                     <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_card_sweetdream" value="{{ sale['sales_card_sweetdream'] }}" /></td>
-                    <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_card_glory" value="{{ sale['sales_card_glory'] }}" /></td>
                     <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_cash" value="{{ sale['sales_cash'] }}" /></td>
                     <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_zeropay" value="{{ sale['sales_zeropay'] }}" /></td>
                     <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_transfer" value="{{ sale['sales_transfer'] }}" /></td>

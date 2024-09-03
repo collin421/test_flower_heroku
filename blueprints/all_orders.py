@@ -1,9 +1,8 @@
 from flask import Blueprint, request, render_template, send_file, jsonify
 from collections import defaultdict
-from io import BytesIO
+from io import BytesIO, StringIO
 import pandas as pd
 from .func import get_db
-# import openpyxl
 
 # 블루프린트 설정
 all_orders_blueprint = Blueprint('all_orders', __name__, template_folder='templates')
@@ -20,19 +19,20 @@ def all_orders():
         
         # 지점별 조회 쿼리 실행
         cur.execute('''
-            SELECT b.name as branch_name, od.product_name, od.color, SUM(od.quantity) as total_quantity, o.special_note
+            SELECT b.name as branch_name, od.bud_type, od.product_name, od.color, SUM(od.quantity) as total_quantity, o.special_note
             FROM orders o
             JOIN branches b ON o.branch_id = b.id
             JOIN order_details od ON o.id = od.order_id
             WHERE o.order_date = ?
-            GROUP BY b.name, od.product_name, od.color, o.special_note
-            ORDER BY b.name, od.product_name, od.color
+            GROUP BY b.name, od.bud_type, od.product_name, od.color, o.special_note
+            ORDER BY od.bud_type, od.product_name, b.name
         ''', (selected_date,))
         
         # 조회 결과를 지점별로 정리
         for row in cur.fetchall():
             branch_name = row['branch_name']
             product_info = {
+                'bud_type': row['bud_type'],
                 'product_name': row['product_name'],
                 'color': row['color'],
                 'total_quantity': row['total_quantity'],
@@ -91,23 +91,25 @@ def download_all_orders():
     
     # 선택된 날짜의 모든 주문 데이터 조회
     cur.execute('''
-        SELECT b.name as branch_name, od.product_name, od.color, SUM(od.quantity) as total_quantity
+        SELECT b.name as branch_name, od.bud_type, od.product_name, od.color, SUM(od.quantity) as total_quantity
         FROM orders o
         JOIN branches b ON o.branch_id = b.id
         JOIN order_details od ON o.id = od.order_id
         WHERE o.order_date = ?
-        GROUP BY b.name, od.product_name, od.color
-        ORDER BY b.name, od.product_name, od.color
+        GROUP BY b.name, od.bud_type, od.product_name, od.color
+        ORDER BY od.bud_type, od.product_name, b.name
     ''', (selected_date,))
     
     orders_by_branch = defaultdict(list)  # 지점별 주문 초기화
     # 조회 결과를 지점별로 정리
     for row in cur.fetchall():
         branch_name = row['branch_name']
+        bud_type = row['bud_type']
         product_name = row['product_name']
         color = row['color']
         total_quantity = row['total_quantity']
         orders_by_branch[branch_name].append({
+            'bud_type': bud_type,
             'product_name': product_name,
             'color': color,
             'total_quantity': total_quantity
@@ -120,23 +122,28 @@ def download_all_orders():
         for order in orders:
             df_list.append({
                 'Branch Name': branch_name,
+                'Bud Type': order['bud_type'],
                 'Product Name': order['product_name'],
                 'Color': order['color'],
                 'Total Quantity': order['total_quantity']
             })
     df = pd.DataFrame(df_list)
     
-    # 엑셀 파일로 변환
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='All Orders')
+    # CSV 파일로 변환
+    output = StringIO()
+    df.to_csv(output, index=False)
     output.seek(0)
 
-    filename = f"all_orders_{selected_date}.xlsx"
-    # 엑셀 파일 다운로드 응답 반환
-    return send_file(output, as_attachment=True,
+    # Convert StringIO to BytesIO for binary mode
+    response = BytesIO()
+    response.write(output.getvalue().encode())
+    response.seek(0)
+
+    filename = f"all_orders_{selected_date}.csv"
+    # CSV 파일 다운로드 응답 반환
+    return send_file(response, as_attachment=True,
                      download_name=filename,
-                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                     mimetype='text/csv')
 
 @all_orders_blueprint.route('/download_all_orders_by_bud_type', methods=['POST'])
 def download_all_orders_by_bud_type():
@@ -186,15 +193,18 @@ def download_all_orders_by_bud_type():
             })
     df = pd.DataFrame(df_list)
     
-    # 엑셀 파일로 변환
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Bud Type Orders')
+    # CSV 파일로 변환
+    output = StringIO()
+    df.to_csv(output, index=False)
     output.seek(0)
 
-    filename = f"all_orders_by_bud_type_{selected_date}.xlsx"
-    # 엑셀 파일 다운로드 응답 반환
-    return send_file(output, as_attachment=True,
-                     download_name=filename,
-                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    # Convert StringIO to BytesIO for binary mode
+    response = BytesIO()
+    response.write(output.getvalue().encode())
+    response.seek(0)
 
+    filename = f"all_orders_by_bud_type_{selected_date}.csv"
+    # CSV 파일 다운로드 응답 반환
+    return send_file(response, as_attachment=True,
+                     download_name=filename,
+                     mimetype='text/csv')

@@ -42,7 +42,7 @@
             {% for branch in branches %}
             ['{{ branch }}', '합계', {% for date in dates %}{{ sales_by_branch[branch][date]['total_sales'] }},{% endfor %}],
             ['', '카드-스위트드림', {% for date in dates %}{{ sales_by_branch[branch][date]['sales_card_sweetdream'] }},{% endfor %}],
-            ['', '카드-글로리', {% for date in dates %}{{ sales_by_branch[branch][date]['sales_card_glory'] }},{% endfor %}],
+            // ['', '카드-글로리', {% for date in dates %}{{ sales_by_branch[branch][date]['sales_card_glory'] }},{% endfor %}],
             ['', '현금', {% for date in dates %}{{ sales_by_branch[branch][date]['sales_cash'] }},{% endfor %}],
             ['', '제로페이', {% for date in dates %}{{ sales_by_branch[branch][date]['sales_zeropay'] }},{% endfor %}],
             ['', '계좌이체', {% for date in dates %}{{ sales_by_branch[branch][date]['sales_transfer'] }},{% endfor %}],

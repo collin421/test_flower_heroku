@@ -30,15 +30,29 @@
                             <table class="table" style="font-size: 14px;">
                                 <thead>
                                     <tr>
+                                        <th style="color: #555;">꽃봉오리 종류</th>
                                         <th style="color: #555;">품목 이름</th>
                                         <th style="color: #555;">색상</th>
                                         <th style="color: #555;">수량</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% set last_bud_type = None %}
+                                    {% set last_product_name = None %}
                                     {% for order in orders %}
                                         <tr style="font-size: 14px;">
-                                            <td>{{ order.product_name }}</td>
+                                            {% if order.bud_type != last_bud_type %}
+                                                <td>{{ order.bud_type }}</td>
+                                                {% set last_bud_type = order.bud_type %}
+                                            {% else %}
+                                                <td></td>
+                                            {% endif %}
+                                            {% if order.product_name != last_product_name %}
+                                                <td>{{ order.product_name }}</td>
+                                                {% set last_product_name = order.product_name %}
+                                            {% else %}
+                                                <td></td>
+                                            {% endif %}
                                             <td>{{ order.color }}</td>
                                             <td>{{ order.total_quantity }}</td>
                                         </tr>
