@@ -37,22 +37,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% set last_bud_type = None %}
-                                    {% set last_product_name = None %}
                                     {% for order in orders %}
                                         <tr style="font-size: 14px;">
-                                            {% if order.bud_type != last_bud_type %}
-                                                <td>{{ order.bud_type }}</td>
-                                                {% set last_bud_type = order.bud_type %}
-                                            {% else %}
-                                                <td></td>
-                                            {% endif %}
-                                            {% if order.product_name != last_product_name %}
-                                                <td>{{ order.product_name }}</td>
-                                                {% set last_product_name = order.product_name %}
-                                            {% else %}
-                                                <td></td>
-                                            {% endif %}
+                                            <td>{{ order.bud_type }}</td>
+                                            <td>{{ order.product_name }}</td>
                                             <td>{{ order.color }}</td>
                                             <td>{{ order.total_quantity }}</td>
                                         </tr>

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, send_file, jsonify
+from flask import Blueprint, request, render_template, send_file
 from collections import defaultdict
 from io import BytesIO, StringIO
 import pandas as pd
@@ -41,9 +41,24 @@ def all_orders():
             orders_by_branch[branch_name].append(product_info)
         cur.close()  # 커서 닫기
 
+    # 중복 값 생략을 위한 데이터 전처리
+    for branch_name, orders in orders_by_branch.items():
+        last_bud_type = None
+        last_product_name = None
+        for order in orders:
+            # 이전 값과 비교하여 중복된 경우 빈 문자열로 설정
+            if order['bud_type'] == last_bud_type:
+                order['bud_type'] = ''
+            else:
+                last_bud_type = order['bud_type']
+
+            if order['product_name'] == last_product_name:
+                order['product_name'] = ''
+            else:
+                last_product_name = order['product_name']
+
     # 템플릿 렌더링
     return render_template('all_orders.html', orders_by_branch=orders_by_branch, selected_date=selected_date)
-
 
 @all_orders_blueprint.route('/all_orders_by_bud_type', methods=['POST'])
 def all_orders_by_bud_type():
