@@ -17,15 +17,15 @@ def all_orders():
         selected_date = request.form.get('order_date')  # 폼에서 선택된 날짜 가져오기
         cur = db.cursor()  # 커서 생성
         
-        # 지점별 조회 쿼리 실행
+        # 지점별 조회 쿼리 실행 (지점 id 순으로 정렬)
         cur.execute('''
-            SELECT b.name as branch_name, od.bud_type, od.product_name, od.color, SUM(od.quantity) as total_quantity, o.special_note
+            SELECT b.name as branch_name, od.bud_type, od.product_name, od.color, SUM(od.quantity) as total_quantity, o.special_note, b.id as branch_id
             FROM orders o
             JOIN branches b ON o.branch_id = b.id
             JOIN order_details od ON o.id = od.order_id
             WHERE o.order_date = ?
-            GROUP BY b.name, od.bud_type, od.product_name, od.color, o.special_note
-            ORDER BY od.bud_type, od.product_name, b.name
+            GROUP BY b.name, od.bud_type, od.product_name, od.color, o.special_note, b.id
+            ORDER BY b.id  -- 지점 ID 기준으로 정렬
         ''', (selected_date,))
         
         # 조회 결과를 지점별로 정리
@@ -112,7 +112,7 @@ def download_all_orders():
         JOIN order_details od ON o.id = od.order_id
         WHERE o.order_date = ?
         GROUP BY b.name, od.bud_type, od.product_name, od.color
-        ORDER BY od.bud_type, od.product_name, b.name
+        ORDER BY b.id  -- 지점 ID 기준으로 정렬
     ''', (selected_date,))
     
     orders_by_branch = defaultdict(list)  # 지점별 주문 초기화
@@ -174,7 +174,7 @@ def download_all_orders_by_bud_type():
         JOIN branches b ON o.branch_id = b.id
         WHERE o.order_date = ?
         GROUP BY od.product_name, od.bud_type, b.name, o.special_note
-        ORDER BY od.product_name, od.bud_type, b.name
+        ORDER BY b.id  -- 지점 ID 기준으로 정렬
     ''', (selected_date,))
     
     orders_by_bud_type = defaultdict(list)  # 꽃봉오리 타입별 주문 초기화

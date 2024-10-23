@@ -9,7 +9,7 @@ def order():
     cur = db.cursor()
 
     if request.method == 'POST':
-        order_date = request.form.get('order_date')  # 날짜 정보 수집
+        order_date = request.form.get('order_date')
         branch_id = request.form.get('branch_id')
         special_note = request.form.get('special_note')
         product_ids = request.form.getlist('product_id[]')
@@ -17,22 +17,19 @@ def order():
         quantities = request.form.getlist('quantity[]')
         bud_types = request.form.getlist('bud_type[]')
 
-        # 주문 정보를 데이터베이스에 저장
-        order_code = generate_code(8)  # 주문 코드 생성
+        order_code = generate_code(8)
         cur.execute("INSERT INTO orders (order_date, branch_id, special_note, order_code) VALUES (?, ?, ?, ?)",
                     (order_date, branch_id, special_note, order_code))
         order_id = cur.lastrowid
 
-        # 상세 주문 정보 저장
         for product_id_name, color, quantity, bud_type in zip(product_ids, colors, quantities, bud_types):
-            product_id, product_name = product_id_name.split('|', 1)  # 품목 ID와 이름 분리
+            product_id, product_name = product_id_name.split('|', 1)
             cur.execute("INSERT INTO order_details (order_id, product_id, quantity, color, product_name, bud_type) VALUES (?, ?, ?, ?, ?, ?)",
                         (order_id, product_id, quantity, color, product_name, bud_type))
         db.commit()
 
         return redirect(url_for('order_view.order_confirmation', order_id=order_id))
     else:
-        # 페이지 로딩 시 필요한 정보 로드
         return render_template('order.html')
 
 @order_blueprint.route('/api/branches')

@@ -2,28 +2,59 @@ document.addEventListener('DOMContentLoaded', function() {
     loadBranches();
     document.getElementById('addOrderItemBtn').addEventListener('click', addOrderItem);
     document.getElementById('removeOrderItemBtn').addEventListener('click', removeLastOrderItem);
-    document.getElementById('orderForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        if (validateForm()) {
-            this.submit();
-        }
-    });
+    document.getElementById('submitOrderBtn').addEventListener('click', showConfirmModal);
+    document.getElementById('confirmOrderBtn').addEventListener('click', submitOrder);
     document.getElementById('orderForm').addEventListener('input', checkFormInputs);
-});
 
-document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('orderDate').value = today;
-
-    loadBranches();
-    document.getElementById('addOrderItemBtn').addEventListener('click', addOrderItem);
-    document.getElementById('orderForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        if (validateForm()) {
-            this.submit();
-        }
-    });
 });
+
+function showConfirmModal() {
+    // 주문 정보를 팝업에 보여주기 위한 함수
+    const orderDate = document.getElementById('orderDate').value;
+    const branch = document.getElementById('branchSelect').options[document.getElementById('branchSelect').selectedIndex].text;
+    const specialNote = document.getElementById('specialNoteTextarea').value;
+    const orderItems = document.querySelectorAll('#orderItems .orderItem');
+
+    document.getElementById('orderDateSummary').innerText = `날짜: ${orderDate}`;
+    document.getElementById('branchSummary').innerText = `지점: ${branch}`;
+    document.getElementById('specialNoteSummary').innerText = `기타 요청 사항: ${specialNote || '없음'}`;
+    
+    // 주문 항목을 팝업 테이블에 동적으로 추가
+    const orderItemsSummary = document.getElementById('orderItemsSummary');
+    orderItemsSummary.innerHTML = ''; // 초기화
+
+    orderItems.forEach((item, index) => {
+        const productSelect = item.querySelector('.productSelect').options[item.querySelector('.productSelect').selectedIndex].text;
+        const colorSelect = item.querySelector('.colorSelect').value;
+        const budTypeSelect = item.querySelector('.budTypeSelect').value;
+        const quantityInput = item.querySelector('.quantityInput').value;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${productSelect}</td>
+            <td>${colorSelect}</td>
+            <td>${budTypeSelect}</td>
+            <td>${quantityInput}</td>
+        `;
+        orderItemsSummary.appendChild(row);
+    });
+
+    // 팝업을 띄움
+    $('#confirmModal').modal('show');
+}
+
+function submitOrder() {
+    const orderForm = document.getElementById('orderForm');
+    
+    // 팝업의 확인 버튼을 누르면 폼을 실제로 서버에 전송함
+    if (validateForm()) {
+        orderForm.submit(); // 서버로 폼 전송
+    }
+
+    $('#confirmModal').modal('hide');
+}
 
 function loadBranches() {
     fetch('/api/branches')
@@ -36,8 +67,6 @@ function loadBranches() {
             const option = new Option(branch.name, branch.id);
             branchSelect.appendChild(option);
         });
-
-        branchSelect.addEventListener('change', () => updateEmailOptions(branches));
     })
     .catch(error => console.error('Error loading branches:', error));
 }

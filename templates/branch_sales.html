@@ -3,61 +3,111 @@
 {% block title %}지점별 매출 조회 및 수정{% endblock %}
 
 {% block content %}
-<div class="container" style="min-height: 100vh; padding-top: 80px; padding-bottom: 30px; background-color: #f8f9fa;">
-    <h2 style="font-size: 24px; color: #333; padding-bottom: 10px;">지점별 매출 조회 및 수정</h2>
+<div class="container-fluid" style="min-height: 100vh; padding-top: 80px; padding-bottom: 30px; background-color: #f8f9fa; max-width: 1200px; margin: 0 auto;">
+    <h2 class="text-center" style="font-size: 24px; color: #333; padding-bottom: 10px;">지점별 매출 조회 및 수정</h2>
+
     <form action="/branch_sales" method="post">
-        <div class="form-group">
-            <label for="sale_date" style="color: #333;">날짜 선택:</label>
-            <input type="date" class="form-control" id="sale_date" name="sale_date" value="{{ selected_date }}" required style="border-radius: 5px;">
+        <div class="form-row">
+            <div class="form-group col-md-6 col-sm-12">
+                <label for="sale_date" style="color: #333;">날짜 선택:</label>
+                <input type="date" class="form-control" id="sale_date" name="sale_date" value="{{ selected_date }}" required style="border-radius: 5px;">
+            </div>
+            <div class="form-group col-md-6 col-sm-12">
+                <label for="branch_id" style="color: #333;">지점 선택:</label>
+                <select class="form-control" id="branch_id" name="branch_id" required style="border-radius: 5px;">
+                    <option value="">지점을 선택하세요</option>
+                    <option value="all">전체 지점</option>
+                    {% for branch in branches %}
+                    <option value="{{ branch['id'] }}" {% if selected_branch_id == branch['id'] %}selected{% endif %}>{{ branch['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="branch_id" style="color: #333;">지점 선택:</label>
-            <select class="form-control" id="branch_id" name="branch_id" required style="border-radius: 5px;">
-                <option value="">지점을 선택하세요</option>
-                <option value="all">전체 지점</option>
-                {% for branch in branches %}
-                <option value="{{ branch['id'] }}" {% if selected_branch_id == branch['id'] %}selected{% endif %}>{{ branch['name'] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary" style="background-color: #4e73df; border: none; border-radius: 5px;">조회하기</button>
+        <button type="submit" class="btn btn-primary w-100 mt-3" style="background-color: #4e73df; border: none; border-radius: 5px;">조회하기</button>
     </form>
 
     {% if sales %}
-    <div class="table-responsive mt-4">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>날짜</th>
-                    <th>지점명</th>
-                    <th>카드(스위트드림)</th>
-                    <th>현금</th>
-                    <th>제로페이</th>
-                    <th>계좌이체</th>
-                    <th>수정</th>
-                    <th>삭제</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in sales %}
-                <tr>
-                    <td>{{ sale['sale_date'] }}</td>
-                    <td>{{ branches_dict[sale['branch_id']] }}</td>
-                    <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_card_sweetdream" value="{{ sale['sales_card_sweetdream'] }}" /></td>
-                    <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_cash" value="{{ sale['sales_cash'] }}" /></td>
-                    <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_zeropay" value="{{ sale['sales_zeropay'] }}" /></td>
-                    <td><input type="number" class="form-control sales-input" data-sale-id="{{ sale['id'] }}" data-field="sales_transfer" value="{{ sale['sales_transfer'] }}" /></td>
-                    <td><button class="btn btn-info update-sale" data-sale-id="{{ sale['id'] }}" disabled>저장</button></td>
-                    <td><button class="btn btn-danger delete-sale" data-sale-id="{{ sale['id'] }}">삭제</button></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="sales-entries mt-4">
+        {% for sale in sales %}
+        <div class="sale-entry" style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
+            <h4 style="color: #333;">날짜: {{ sale['sale_date'] }} / 지점: {{ branches_dict[sale['branch_id']] }}</h4>
+            
+            <div class="form-row">
+                <!-- 매출 입력 필드 -->
+                <div class="form-group col-md-2 col-sm-12">
+                    <label for="sales_card_sweetdream_{{ sale['id'] }}" style="color: #333;">카드(스위트드림):</label>
+                    <input type="number" class="form-control sales-input" id="sales_card_sweetdream_{{ sale['id'] }}" data-sale-id="{{ sale['id'] }}" data-field="sales_card_sweetdream" value="{{ sale['sales_card_sweetdream'] }}">
+                </div>
+
+                <div class="form-group col-md-2 col-sm-12">
+                    <label for="sales_cash_{{ sale['id'] }}" style="color: #333;">현금:</label>
+                    <input type="number" class="form-control sales-input" id="sales_cash_{{ sale['id'] }}" data-sale-id="{{ sale['id'] }}" data-field="sales_cash" value="{{ sale['sales_cash'] }}">
+                </div>
+
+                <div class="form-group col-md-2 col-sm-12">
+                    <label for="sales_zeropay_{{ sale['id'] }}" style="color: #333;">제로페이:</label>
+                    <input type="number" class="form-control sales-input" id="sales_zeropay_{{ sale['id'] }}" data-sale-id="{{ sale['id'] }}" data-field="sales_zeropay" value="{{ sale['sales_zeropay'] }}">
+                </div>
+
+                <div class="form-group col-md-2 col-sm-12">
+                    <label for="sales_transfer_{{ sale['id'] }}" style="color: #333;">계좌이체:</label>
+                    <input type="number" class="form-control sales-input" id="sales_transfer_{{ sale['id'] }}" data-sale-id="{{ sale['id'] }}" data-field="sales_transfer" value="{{ sale['sales_transfer'] }}">
+                </div>
+
+                <!-- 버튼: 저장 및 삭제 -->
+                <div class="form-group col-md-2 col-sm-6">
+                    <label style="color: #333;">&nbsp;</label> <!-- 공백을 넣어 버튼과 필드 간의 정렬 -->
+                    <button class="btn btn-info update-sale w-100" data-sale-id="{{ sale['id'] }}" disabled>저장</button>
+                </div>
+                <div class="form-group col-md-2 col-sm-6">
+                    <label style="color: #333;">&nbsp;</label> <!-- 공백을 넣어 버튼과 필드 간의 정렬 -->
+                    <button class="btn btn-danger delete-sale w-100" data-sale-id="{{ sale['id'] }}">삭제</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
     {% else %}
     <p class="text-center" style="font-size: 16px; color: #333; padding-top: 20px;">매출 내역이 없습니다.</p>
     {% endif %}
 </div>
+
+<!-- Custom CSS for responsive input fields -->
+<style>
+.sales-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sale-entry {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) {
+    .form-row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+}
+</style>
+
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

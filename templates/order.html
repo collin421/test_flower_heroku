@@ -8,10 +8,17 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <style>
+        #orderItemsSummaryTable {
+            max-height: 300px;
+            overflow-y: auto;
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <form id="orderForm" action="/order" method="POST">
+        <form id="orderForm" method="POST">
             <div id="order-header">
                 <h3 class="mt-5">꽃 주문하기</h3>
             </div>
@@ -40,10 +47,52 @@
                     <span class="material-icons">remove</span>
                 </button>
             </div>          
-            <button type="submit" class="btn btn-primary mb-3 btn-block order-submit-button" id="submitOrderBtn" disabled>주문하기</button>
+            <button type="button" class="btn btn-primary mb-3 btn-block order-submit-button" id="submitOrderBtn" disabled>주문 하기</button>
         </form>
     </div>
 
+    <!-- 팝업 모달 추가 -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">주문 확인</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- 주문 내역을 표 형태로 표시 -->
+                    <div id="orderSummary">
+                        <h6>주문 내역:</h6>
+                        <p id="orderDateSummary"></p>
+                        <p id="branchSummary"></p>
+                        <div id="orderItemsSummaryTable">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>품목</th>
+                                        <th>색상</th>
+                                        <th>봉오리 타입</th>
+                                        <th>수량</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderItemsSummary">
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="specialNoteSummary"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="confirmOrderBtn">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/static/js/order.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
