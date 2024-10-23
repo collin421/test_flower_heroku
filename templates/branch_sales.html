@@ -28,7 +28,7 @@
 
     {% if sales %}
     <!-- 주문 날짜 상단에 한 번만 표시 -->
-    <h4 class="mt-4" style="color: #333;">주문 날짜: {{ sale['sale_date'] }} </h4>
+    <h4 class="mt-4" style="color: #333;">주문 날짜: {{ sales[0]['sale_date'] if sales else '데이터 없음' }} </h4>
     <div class="sales-entries mt-4">
         {% for sale in sales %}
         <div class="sale-entry" style="margin-bottom: 20px; border: 1px solid #ddd; padding: 15px; border-radius: 5px;">
