@@ -1,50 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>매출 입력하기</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <h2 class="mt-5">매출 입력하기</h2>
-            <form id="salesForm" action="/sales" method="POST">
-                <div class="form-group">
-                    <label for="saleDate">날짜</label>
-                    <input type="date" class="form-control" id="saleDate" name="sale_date" required>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매출 입력하기</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">매출 입력하기</h2>
+        <form id="salesForm" action="/sales" method="POST">
+            <div class="form-group">
+                <label for="saleDate">날짜</label>
+                <input type="date" class="form-control" id="saleDate" name="sale_date" required>
+            </div>
+            <div class="form-group">
+                <label for="branchSelect">지점 선택</label>
+                <select class="form-control" id="branchSelect" name="branch_id" required></select>
+            </div>
+            <h4>매출 정보</h4>
+            <div class="form-group">
+                <label for="salesCardSweetdream">매출 (카드-스위트드림)</label>
+                <input type="number" class="form-control" id="salesCardSweetdream" name="sales_card_sweetdream" min="0">
+            </div>
+            <div class="form-group">
+                <label for="salesCash">매출 (현금)</label>
+                <input type="number" class="form-control" id="salesCash" name="sales_cash" min="0">
+            </div>
+            <div class="form-group">
+                <label for="salesZeropay">매출 (제로페이)</label>
+                <input type="number" class="form-control" id="salesZeropay" name="sales_zeropay" min="0">
+            </div>
+            <div class="form-group">
+                <label for="salesTransfer">매출 (계좌이체)</label>
+                <input type="number" class="form-control" id="salesTransfer" name="sales_transfer" min="0">
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitSalesButton">매출 입력</button>
+        </form>
+    </div>
+
+    <!-- 확인 모달 -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">매출 내역 확인</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="branchSelect">지점 선택</label>
-                    <select class="form-control" id="branchSelect" name="branch_id" required></select>
+                <div class="modal-body">
+                    <p><strong>날짜:</strong> <span id="confirmSaleDate"></span></p>
+                    <p><strong>지점:</strong> <span id="confirmBranch"></span></p>
+                    <p><strong>카드-스위트드림:</strong> <span id="confirmSalesCardSweetdream"></span></p>
+                    <p><strong>현금:</strong> <span id="confirmSalesCash"></span></p>
+                    <p><strong>제로페이:</strong> <span id="confirmSalesZeropay"></span></p>
+                    <p><strong>계좌이체:</strong> <span id="confirmSalesTransfer"></span></p>
                 </div>
-                <h4>매출 정보</h4>
-                <div class="form-group">
-                    <label for="salesCardSweetdream">매출 (카드-스위트드림)</label>
-                    <input type="number" class="form-control" id="salesCardSweetdream" name="sales_card_sweetdream" min="0">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmit">확인</button>
                 </div>
-                <!-- <div class="form-group">
-                    <label for="salesCardGlory">매출 (카드-글로리)</label>
-                    <input type="number" class="form-control" id="salesCardGlory" name="sales_card_glory" min="0">
-                </div> -->
-                <div class="form-group">
-                    <label for="salesCash">매출 (현금)</label>
-                    <input type="number" class="form-control" id="salesCash" name="sales_cash" min="0">
-                </div>
-                <div class="form-group">
-                    <label for="salesZeropay">매출 (제로페이)</label>
-                    <input type="number" class="form-control" id="salesZeropay" name="sales_zeropay" min="0">
-                </div>
-                <div class="form-group">
-                    <label for="salesTransfer">매출 (계좌이체)</label>
-                    <input type="number" class="form-control" id="salesTransfer" name="sales_transfer" min="0">
-                </div>
-                <button type="submit" class="btn btn-primary">매출 입력</button>
-            </form>
+            </div>
         </div>
-        <script src="/static/js/sales.js" defer></script>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    </body>
+    </div>
+
+    <!-- JavaScript 파일 연결 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/static/js/sales.js" defer></script>
+</body>
 </html>
